@@ -1,0 +1,20 @@
+[workspace.package]
+version = "0.1.0"
+authors = ["Nagy Tibor <xnagytibor@protonmail.com>"]
+license = "MIT"
+edition = "2021"
+rust-version = "1.76"
+
+[workspace]
+resolver = "2"
+members = [
+    "crates/basic",
+    "crates/serde-c64",
+    "crates/serde-c64-test",
+]
+
+[workspace.dependencies]
+basic     = { path = "crates/basic"     }
+serde-c64 = { path = "crates/serde-c64" }
+
+serde = { version = "1.0.197", features = ["derive"] }
