@@ -33,9 +33,7 @@ where
     };
 
     value.serialize(&mut serializer)?;
-    if serializer.basic_next_line_started {
-        serializer.finalize_line()?;
-    }
+    serializer.finalize_line()?;
 
     writer.write_all(&serializer.basic_program.to_bytes()).unwrap();
 
@@ -154,33 +152,34 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     }
 
     fn serialize_none(self) -> Result<()> {
-        todo!()
+        self.serialize_bool(false)
     }
 
     fn serialize_some<T: ?Sized>(self, value: &T) -> Result<()>
     where
         T: Serialize,
     {
-        todo!()
+        self.serialize_bool(true)?;
+        value.serialize(self)
     }
 
     fn serialize_unit(self) -> Result<()> {
-        todo!()
+        Ok(())
     }
 
     fn serialize_unit_struct(self, name: &'static str) -> Result<()> {
-        todo!()
+        Ok(())
     }
 
     fn serialize_unit_variant(self, name: &'static str, variant_index: u32, variant: &'static str) -> Result<()> {
-        todo!()
+        variant_index.serialize(self)
     }
 
     fn serialize_newtype_struct<T: ?Sized>(self, name: &'static str, value: &T) -> Result<()>
     where
         T: Serialize,
     {
-        todo!()
+        value.serialize(self)
     }
 
     fn serialize_newtype_variant<T: ?Sized>(
@@ -193,7 +192,7 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     where
         T: Serialize,
     {
-        todo!()
+        variant_index.serialize(self)
     }
 
     fn serialize_seq(self, len: Option<usize>) -> Result<Self::SerializeSeq> {
@@ -205,7 +204,7 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     }
 
     fn serialize_tuple_struct(self, name: &'static str, len: usize) -> Result<Self::SerializeTupleStruct> {
-        todo!()
+        Ok(self)
     }
 
     fn serialize_tuple_variant(
@@ -215,15 +214,15 @@ impl<'a> ser::Serializer for &'a mut Serializer {
         variant: &'static str,
         len: usize,
     ) -> Result<Self::SerializeTupleVariant> {
-        todo!()
+        Ok(self)
     }
 
     fn serialize_map(self, len: Option<usize>) -> Result<Self::SerializeMap> {
-        todo!()
+        Ok(self)
     }
 
     fn serialize_struct(self, name: &'static str, len: usize) -> Result<Self::SerializeStruct> {
-        todo!()
+        Ok(self)
     }
 
     fn serialize_struct_variant(
@@ -233,7 +232,7 @@ impl<'a> ser::Serializer for &'a mut Serializer {
         variant: &'static str,
         len: usize,
     ) -> Result<Self::SerializeStructVariant> {
-        todo!()
+        Ok(self)
     }
 }
 
@@ -248,7 +247,7 @@ impl<'a> ser::SerializeSeq for &'a mut Serializer {
         value.serialize(&mut **self)
     }
 
-    fn end(self) -> Result<Self::Ok> {
+    fn end(self) -> Result<()> {
         self.finalize_line()
     }
 }
@@ -264,7 +263,7 @@ impl<'a> ser::SerializeTuple for &'a mut Serializer {
         value.serialize(&mut **self)
     }
 
-    fn end(self) -> Result<Self::Ok> {
+    fn end(self) -> Result<()> {
         self.finalize_line()
     }
 }
@@ -277,11 +276,11 @@ impl<'a> ser::SerializeTupleStruct for &'a mut Serializer {
     where
         T: Serialize,
     {
-        todo!()
+        value.serialize(&mut **self)
     }
 
-    fn end(self) -> Result<Self::Ok> {
-        todo!()
+    fn end(self) -> Result<()> {
+        Ok(())
     }
 }
 
@@ -293,11 +292,11 @@ impl<'a> ser::SerializeTupleVariant for &'a mut Serializer {
     where
         T: Serialize,
     {
-        todo!()
+        value.serialize(&mut **self)
     }
 
-    fn end(self) -> Result<Self::Ok> {
-        todo!()
+    fn end(self) -> Result<()> {
+        Ok(())
     }
 }
 
@@ -309,18 +308,18 @@ impl<'a> ser::SerializeMap for &'a mut Serializer {
     where
         T: Serialize,
     {
-        todo!()
+        key.serialize(&mut **self)
     }
 
     fn serialize_value<T: ?Sized>(&mut self, value: &T) -> Result<()>
     where
         T: Serialize,
     {
-        todo!()
+        value.serialize(&mut **self)
     }
 
-    fn end(self) -> Result<Self::Ok> {
-        todo!()
+    fn end(self) -> Result<()> {
+        self.finalize_line()
     }
 }
 
@@ -332,11 +331,11 @@ impl<'a> ser::SerializeStruct for &'a mut Serializer {
     where
         T: Serialize,
     {
-        todo!()
+        value.serialize(&mut **self)
     }
 
-    fn end(self) -> Result<Self::Ok> {
-        todo!()
+    fn end(self) -> Result<()> {
+        self.finalize_line()
     }
 }
 
@@ -348,10 +347,10 @@ impl<'a> ser::SerializeStructVariant for &'a mut Serializer {
     where
         T: Serialize,
     {
-        todo!()
+        value.serialize(&mut **self)
     }
 
-    fn end(self) -> Result<Self::Ok> {
-        todo!()
+    fn end(self) -> Result<()> {
+        Ok(())
     }
 }

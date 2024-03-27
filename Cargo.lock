@@ -55,6 +55,7 @@ name = "serde-c64-test"
 version = "0.1.0"
 dependencies = [
  "basic",
+ "serde",
  "serde-c64",
 ]
 
