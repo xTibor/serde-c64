@@ -2,13 +2,14 @@ use std::collections::HashMap;
 
 use lazy_static::lazy_static;
 
-#[derive(Debug)]
+#[derive(Debug, Default, Copy, Clone)]
 pub struct PetsciiEncodingOptions {
     pub variant: PetsciiVariant,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default, Copy, Clone)]
 pub enum PetsciiVariant {
+    #[default]
     Unshifted,
     Shifted,
 }

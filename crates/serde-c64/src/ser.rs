@@ -1,31 +1,50 @@
+use std::io::Write;
+
 use basic::{BasicKeyword, BasicLine, BasicProgram, BasicToken, PetsciiEncodingOptions, PetsciiString};
 use serde::{ser, Serialize};
-use std::io::Write;
 
 use crate::error::{Error, Result};
 
+#[derive(Debug, Copy, Clone)]
+pub struct Options {
+    pub line_number_start: usize,
+
+    pub line_number_increment: usize,
+
+    pub encoding_options: PetsciiEncodingOptions,
+}
+
+impl Default for Options {
+    fn default() -> Self {
+        Self {
+            line_number_start: 1000,
+            line_number_increment: 1,
+            encoding_options: Default::default(),
+        }
+    }
+}
+
 pub struct Serializer {
+    options: Options,
+
     line_number_next: usize,
-    line_number_increment: usize,
     basic_program: BasicProgram,
 
     basic_next_line: BasicLine,
     basic_next_line_started: bool,
 }
 
-pub fn to_writer<W, T>(mut writer: W, value: &T) -> Result<()>
+pub fn to_writer<W, T>(mut writer: W, value: &T, options: Options) -> Result<()>
 where
     W: Write,
     T: ?Sized + Serialize,
 {
     let mut serializer = Serializer {
-        line_number_next: 1000,
-        line_number_increment: 1,
+        options: options.clone(),
+        line_number_next: options.line_number_start,
         basic_program: BasicProgram {
             load_address: 0x0801,
-            encoding_options: PetsciiEncodingOptions {
-                variant: basic::PetsciiVariant::Unshifted,
-            },
+            encoding_options: options.encoding_options,
             contents: vec![],
         },
         basic_next_line: BasicLine(0, vec![BasicKeyword::Data.into()]),
@@ -46,7 +65,7 @@ impl Serializer {
             self.basic_next_line.0 = u16::try_from(self.line_number_next).unwrap();
             self.basic_program.contents.push(self.basic_next_line.clone());
 
-            self.line_number_next += self.line_number_increment;
+            self.line_number_next += self.options.line_number_increment;
             self.basic_next_line = BasicLine(0, vec![BasicKeyword::Data.into()]);
             self.basic_next_line_started = false;
         }

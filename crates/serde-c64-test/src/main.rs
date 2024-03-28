@@ -1,6 +1,8 @@
-use serde::Serialize;
 use std::collections::HashMap;
 use std::fs::File;
+
+use basic::PetsciiEncodingOptions;
+use serde::Serialize;
 
 #[derive(Serialize)]
 struct Person {
@@ -53,5 +55,14 @@ fn main() {
     };
 
     let test_output = File::create("disk/test-output").unwrap();
-    serde_c64::to_writer(test_output, &test_data).unwrap();
+
+    let options = serde_c64::Options {
+        line_number_start: 1000,
+        line_number_increment: 1,
+        encoding_options: PetsciiEncodingOptions {
+            variant: basic::PetsciiVariant::Shifted,
+        },
+    };
+
+    serde_c64::to_writer(test_output, &test_data, options).unwrap();
 }

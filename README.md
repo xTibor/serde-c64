@@ -16,7 +16,8 @@ fn main() {
     ];
 
     let test_output = File::create("disk/test-output").unwrap();
-    serde_c64::to_writer(test_output, &test_data).unwrap();
+    let options = serde_c64::Options::default();
+    serde_c64::to_writer(test_output, &test_data, options).unwrap();
 }
 ```
 
