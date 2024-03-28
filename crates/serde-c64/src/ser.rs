@@ -12,6 +12,12 @@ pub struct Options {
     pub line_number_increment: usize,
 
     pub encoding_options: PetsciiEncodingOptions,
+
+    pub emit_bytes_length: bool,
+
+    pub emit_sequence_length: bool,
+
+    pub emit_map_length: bool,
 }
 
 impl Default for Options {
@@ -20,6 +26,9 @@ impl Default for Options {
             line_number_start: 1000,
             line_number_increment: 1,
             encoding_options: Default::default(),
+            emit_bytes_length: false,
+            emit_sequence_length: false,
+            emit_map_length: false,
         }
     }
 }
@@ -164,6 +173,11 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     }
 
     fn serialize_bytes(self, v: &[u8]) -> Result<()> {
+        if self.options.emit_bytes_length {
+            self.serialize_u64(v.len() as u64)?;
+            self.finalize_line()?;
+        }
+
         for b in v {
             self.serialize_u8(*b)?;
         }
@@ -215,6 +229,11 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     }
 
     fn serialize_seq(self, len: Option<usize>) -> Result<Self::SerializeSeq> {
+        if self.options.emit_sequence_length {
+            self.serialize_u64(len.unwrap_or(0) as u64)?;
+            self.finalize_line()?;
+        }
+
         Ok(self)
     }
 
@@ -237,6 +256,11 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     }
 
     fn serialize_map(self, len: Option<usize>) -> Result<Self::SerializeMap> {
+        if self.options.emit_map_length {
+            self.serialize_u64(len.unwrap_or(0) as u64)?;
+            self.finalize_line()?;
+        }
+
         Ok(self)
     }
 

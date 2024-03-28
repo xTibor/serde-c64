@@ -62,6 +62,9 @@ fn main() {
         encoding_options: PetsciiEncodingOptions {
             variant: basic::PetsciiVariant::Shifted,
         },
+        emit_bytes_length: false,
+        emit_sequence_length: true,
+        emit_map_length: true,
     };
 
     serde_c64::to_writer(test_output, &test_data, options).unwrap();
