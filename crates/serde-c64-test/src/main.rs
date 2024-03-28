@@ -1,12 +1,56 @@
+use serde::Serialize;
+use std::collections::HashMap;
 use std::fs::File;
+
+#[derive(Serialize)]
+struct Person {
+    first_name: &'static str,
+    last_name: &'static str,
+    birth_year: isize,
+}
+
+#[derive(Serialize)]
+struct TestStruct {
+    people: Vec<Person>,
+    route: Vec<(&'static str, (f32, f32))>,
+    stand_cries: HashMap<&'static str, &'static str>,
+    units: (((), ((), ())), ((), ()), u8),
+}
 
 fn main() {
     #[rustfmt::skip]
-    let test_data = vec![
-        ("Hello",     1337, false),
-        ("world!",      64, true ),
-        ("serde-c64", 1234, true ),
-    ];
+    let test_data = TestStruct {
+        people: vec![
+            Person { first_name: "Jonathan", last_name: "Joestar",     birth_year: 1868 },
+            Person { first_name: "Joseph",   last_name: "Joestar",     birth_year: 1920 },
+            Person { first_name: "Jotaro",   last_name: "Kujo",        birth_year: 1971 },
+            Person { first_name: "Josuke",   last_name: "Higashikata", birth_year: 1983 },
+            Person { first_name: "Giorno",   last_name: "Giovanna",    birth_year: 1985 },
+            Person { first_name: "Jolyne",   last_name: "Cujoh",       birth_year: 1992 },
+        ],
+        route: vec![
+            ("Tokyo",     (35.7642, 140.3849)),
+            ("Hong Kong", (22.2948, 114.1661)),
+            ("Singapore", ( 1.2804, 103.8441)),
+            ("Calcutta",  (22.5432,  88.3662)),
+            ("Varanasi",  (25.3127,  82.9855)),
+            ("Karachi",   (24.8455,  66.9922)),
+            ("Yabrin",    (23.3005,  48.9666)),
+            ("Aswan",     (24.0889,  32.8986)),
+            ("Kom Ombo",  (24.4770,  32.9457)),
+            ("Luxor",     (25.6965,  32.6443)),
+            ("Cairo",     (30.0746,  31.2450)),
+        ],
+        stand_cries: HashMap::from([
+            ("Dio Brando",            "MUDAMUDAMUDA"),
+            ("Giorno Giovanna",       "MUDAMUDAMUDA"),
+            ("Jean Pierre Polnareff", "HORAHORAHORA"),
+            ("Jolyne Cujoh",          "ORAORAORA"   ),
+            ("Josuke Higashikata",    "DORARARA"    ),
+            ("Jotaro Kujo",           "ORAORAORA"   ),
+        ]),
+        units: (((), ((), ())), ((), ()), 1),
+    };
 
     let test_output = File::create("disk/test-output").unwrap();
     serde_c64::to_writer(test_output, &test_data).unwrap();
