@@ -7,9 +7,9 @@ use crate::error::{Error, Result};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Options {
-    pub line_number_start: usize,
+    pub line_number_start: u16,
 
-    pub line_number_increment: usize,
+    pub line_number_increment: u16,
 
     pub encoding_options: PetsciiEncodingOptions,
 
@@ -35,11 +35,9 @@ impl Default for Options {
 
 pub struct Serializer {
     options: Options,
-
-    line_number_next: usize,
     basic_program: BasicProgram,
-
     basic_next_line: BasicLine,
+    basic_next_line_number: u16,
     basic_next_line_started: bool,
 }
 
@@ -50,13 +48,13 @@ where
 {
     let mut serializer = Serializer {
         options: options.clone(),
-        line_number_next: options.line_number_start,
         basic_program: BasicProgram {
             load_address: 0x0801,
             encoding_options: options.encoding_options,
             contents: vec![],
         },
-        basic_next_line: BasicLine(0, vec![BasicKeyword::Data.into()]),
+        basic_next_line: BasicLine(options.line_number_start, vec![BasicKeyword::Data.into()]),
+        basic_next_line_number: options.line_number_start,
         basic_next_line_started: false,
     };
 
@@ -71,11 +69,10 @@ where
 impl Serializer {
     fn finalize_line(&mut self) -> Result<()> {
         if self.basic_next_line_started {
-            self.basic_next_line.0 = u16::try_from(self.line_number_next).unwrap();
             self.basic_program.contents.push(self.basic_next_line.clone());
 
-            self.line_number_next += self.options.line_number_increment;
-            self.basic_next_line = BasicLine(0, vec![BasicKeyword::Data.into()]);
+            self.basic_next_line_number += self.options.line_number_increment; // TODO: Overflow
+            self.basic_next_line = BasicLine(self.basic_next_line_number, vec![BasicKeyword::Data.into()]);
             self.basic_next_line_started = false;
         }
         Ok(())
