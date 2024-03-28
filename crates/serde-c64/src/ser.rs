@@ -78,19 +78,18 @@ impl Serializer {
         Ok(())
     }
 
-    fn push_str(&mut self, s: &str) -> Result<()> {
+    fn str_to_list_token(&self, s: &str) -> BasicToken {
         if self.basic_next_line_started {
-            self.push_token(BasicToken::Raw(PetsciiString(format!(", {}", s))))?;
+            BasicToken::Raw(PetsciiString(format!(", {}", s)))
         } else {
-            self.push_token(BasicToken::Raw(PetsciiString(format!(" {}", s))))?;
+            BasicToken::Raw(PetsciiString(format!(" {}", s)))
         }
-        Ok(())
     }
 
-    fn push_token(&mut self, token: BasicToken) -> Result<()> {
-        if let Err(_) = self.basic_next_line.push_token(token.clone()) {
+    fn push_str(&mut self, s: &str) -> Result<()> {
+        if let Err(_) = self.basic_next_line.push_token(self.str_to_list_token(s)) {
             self.finalize_line()?;
-            if let Err(_) = self.basic_next_line.push_token(token) {
+            if let Err(_) = self.basic_next_line.push_token(self.str_to_list_token(s)) {
                 panic!("Failed to serialize token")
             } else {
                 self.basic_next_line_started = true;
