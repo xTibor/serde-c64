@@ -78,26 +78,30 @@ impl Serializer {
         Ok(())
     }
 
-    fn str_to_list_token(&self, s: &str) -> BasicToken {
+    fn quote_and_escape(&self, s: impl ToString) -> String {
+        format!("\"{}\"", s.to_string().replace("\"", "'"))
+    }
+
+    fn format_basic_data_item(&self, s: impl AsRef<str>) -> BasicToken {
         if self.basic_next_line_started {
-            BasicToken::Raw(PetsciiString(format!(", {}", s)))
+            BasicToken::Raw(PetsciiString(format!(", {}", s.as_ref())))
         } else {
-            BasicToken::Raw(PetsciiString(format!(" {}", s)))
+            BasicToken::Raw(PetsciiString(format!(" {}", s.as_ref())))
         }
     }
 
-    fn push_str(&mut self, s: &str) -> Result<()> {
-        if let Err(_) = self.basic_next_line.push_token(self.str_to_list_token(s)) {
+    fn emit_basic_data_item(&mut self, s: impl ToString) -> Result<()> {
+        let token = self.format_basic_data_item(s.to_string());
+        if let Err(_) = self.basic_next_line.push_token(token) {
             self.finalize_line()?;
-            if let Err(_) = self.basic_next_line.push_token(self.str_to_list_token(s)) {
-                panic!("Failed to serialize token")
-            } else {
-                self.basic_next_line_started = true;
+
+            let token = self.format_basic_data_item(s.to_string());
+            if let Err(_) = self.basic_next_line.push_token(token) {
+                panic!("Failed to serialize token");
             }
-        } else {
-            self.basic_next_line_started = true;
         }
 
+        self.basic_next_line_started = true;
         Ok(())
     }
 }
@@ -115,57 +119,57 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     type SerializeStructVariant = Self;
 
     fn serialize_bool(self, v: bool) -> Result<()> {
-        self.push_str(if v { "1" } else { "0" })
+        self.emit_basic_data_item(if v { "1" } else { "0" })
     }
 
     fn serialize_i8(self, v: i8) -> Result<()> {
-        self.push_str(format!("{}", v).as_str())
+        self.emit_basic_data_item(v)
     }
 
     fn serialize_i16(self, v: i16) -> Result<()> {
-        self.push_str(format!("{}", v).as_str())
+        self.emit_basic_data_item(v)
     }
 
     fn serialize_i32(self, v: i32) -> Result<()> {
-        self.push_str(format!("{}", v).as_str())
+        self.emit_basic_data_item(v)
     }
 
     fn serialize_i64(self, v: i64) -> Result<()> {
-        self.push_str(format!("{}", v).as_str())
+        self.emit_basic_data_item(v)
     }
 
     fn serialize_u8(self, v: u8) -> Result<()> {
-        self.push_str(format!("{}", v).as_str())
+        self.emit_basic_data_item(v)
     }
 
     fn serialize_u16(self, v: u16) -> Result<()> {
-        self.push_str(format!("{}", v).as_str())
+        self.emit_basic_data_item(v)
     }
 
     fn serialize_u32(self, v: u32) -> Result<()> {
-        self.push_str(format!("{}", v).as_str())
+        self.emit_basic_data_item(v)
     }
 
     fn serialize_u64(self, v: u64) -> Result<()> {
-        self.push_str(format!("{}", v).as_str())
+        self.emit_basic_data_item(v)
     }
 
     fn serialize_f32(self, v: f32) -> Result<()> {
-        self.push_str(format!("{}", v).as_str())
+        self.emit_basic_data_item(v)
     }
 
     fn serialize_f64(self, v: f64) -> Result<()> {
-        self.push_str(format!("{}", v).as_str())
+        self.emit_basic_data_item(v)
     }
 
     fn serialize_char(self, v: char) -> Result<()> {
-        // TODO: Escape quotes
-        self.push_str(format!("\"{}\"", v).as_str())
+        let escaped = self.quote_and_escape(v);
+        self.emit_basic_data_item(escaped)
     }
 
     fn serialize_str(self, v: &str) -> Result<()> {
-        // TODO: Escape quotes
-        self.push_str(format!("\"{}\"", v).as_str())
+        let escaped = self.quote_and_escape(v);
+        self.emit_basic_data_item(escaped)
     }
 
     fn serialize_bytes(self, v: &[u8]) -> Result<()> {

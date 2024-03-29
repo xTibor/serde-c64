@@ -28,6 +28,7 @@ struct TestStruct {
     cards: [(usize, CardSuit); 5],
     units: (((), ((), ())), ((), ()), u8),
     to_be_continued: Duration,
+    string_escape: Vec<&'static str>,
 }
 
 fn main() {
@@ -71,6 +72,9 @@ fn main() {
         ],
         units: (((), ((), ())), ((), ()), 1),
         to_be_continued: Duration::from_secs(603300),
+        string_escape: vec![
+            "", "\"", "\"\"", "\"\"\"", "a\"", "\"a", "a\"a", "\"a\"",
+        ]
     };
 
     let test_output = File::create("disk/test-output").unwrap();
