@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::fs::File;
+use std::time::Duration;
 
 use basic::PetsciiEncodingOptions;
 use serde::Serialize;
@@ -12,11 +13,21 @@ struct Person {
 }
 
 #[derive(Serialize)]
+enum CardSuit {
+    Diamonds,
+    Clubs,
+    Hearts,
+    Spades,
+}
+
+#[derive(Serialize)]
 struct TestStruct {
     people: Vec<Person>,
     route: Vec<(&'static str, (f32, f32))>,
     stand_cries: HashMap<&'static str, &'static str>,
+    cards: [(usize, CardSuit); 5],
     units: (((), ((), ())), ((), ()), u8),
+    to_be_continued: Duration,
 }
 
 fn main() {
@@ -51,7 +62,15 @@ fn main() {
             ("Josuke Higashikata",    "DORARARA"    ),
             ("Jotaro Kujo",           "ORAORAORA"   ),
         ]),
+        cards: [
+            ( 8, CardSuit::Diamonds),
+            ( 6, CardSuit::Spades  ),
+            (10, CardSuit::Hearts  ),
+            ( 1, CardSuit::Hearts  ),
+            (11, CardSuit::Clubs   ),
+        ],
         units: (((), ((), ())), ((), ()), 1),
+        to_be_continued: Duration::from_secs(603300),
     };
 
     let test_output = File::create("disk/test-output").unwrap();
