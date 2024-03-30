@@ -74,8 +74,17 @@ fn main() {
         units: (((), ((), ())), ((), ()), 1),
         to_be_continued: Duration::from_secs(603300),
         string_escape: vec![
-            "", "\"", "\"\"", "\"\"\"", "a\"", "\"a", "a\"a", "\"a\"",
-        ]
+            "", "\"", "\"\"", "\"\"\"", "a\"", "\"a", "a\"a", "\"a\"", "A\"", "\"A", "A\"A", "\"A\"",
+            "aa", "aA", "AA", "\"aa", "\"aA", "\"AA", "aa\"", "aA\"", "AA\"",
+            " \"aa", " \"aA", " \"AA", " aa\"", " aA\"", " AA\"",
+            "\"aa ", "\"aA ", "\"AA ", "aa\" ", "aA\" ", "AA\" ",
+            " aa", " aA", " AA", "aa ", "aA ", "AA "," aa ", " aA ", " AA ",
+            ",", "a,", ",a", "a,a", ",a,", "A,", ",A", "A,A", ",A,",
+            " ,", " a,", " ,a", " a,a", " ,a,", " A,", " ,A", " A,A", " ,A,",
+            ", ", "a, ", ",a ", "a,a ", ",a, ",  "A, ", ",A ", "A,A ", ",A, ",
+            " , ", " a, ", " ,a ", " a,a ", " ,a, ", " A, ", " ,A ", " A,A ", " ,A, ",
+        ],
+
     };
 
     let test_output = File::create("disk/test-output").unwrap();

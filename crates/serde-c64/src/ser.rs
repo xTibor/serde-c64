@@ -79,7 +79,30 @@ impl Serializer {
     }
 
     fn quote_and_escape(&self, s: impl ToString) -> String {
-        format!("\"{}\"", s.to_string().replace('"', "'"))
+        let s = s.to_string();
+
+        let all_letters_unshifted = match self.options.encoding_options.variant {
+            basic::PetsciiVariant::Unshifted => true,
+            basic::PetsciiVariant::Shifted => !s.chars().any(char::is_uppercase),
+        };
+
+        let has_leading_trailing_whitespace = s.starts_with(' ') || s.ends_with(' ');
+
+        if has_leading_trailing_whitespace || !all_letters_unshifted || s.contains(',') {
+            if s.contains('"') {
+                format!("\"{}\"", s.replace('"', "?"))
+            } else {
+                format!("\"{}\"", s)
+            }
+        } else {
+            if s.is_empty() || has_leading_trailing_whitespace {
+                format!("\"{}\"", s)
+            } else if s.starts_with('"') {
+                s.replace('"', "?")
+            } else {
+                s
+            }
+        }
     }
 
     fn format_basic_data_item(&self, s: impl AsRef<str>) -> BasicToken {
