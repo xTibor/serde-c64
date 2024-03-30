@@ -86,22 +86,16 @@ impl Serializer {
             basic::PetsciiVariant::Shifted => !s.chars().any(char::is_uppercase),
         };
 
-        let has_leading_trailing_whitespace = s.starts_with(' ') || s.ends_with(' ');
-
-        if has_leading_trailing_whitespace || !all_letters_unshifted || s.contains(',') {
-            if s.contains('"') {
-                format!("\"{}\"", s.replace('"', "?"))
-            } else {
-                format!("\"{}\"", s)
-            }
+        if s.is_empty()
+            || s.starts_with(' ')
+            || s.ends_with(' ')
+            || s.contains(',')
+            || s.contains('"')
+            || !all_letters_unshifted
+        {
+            format!("\"{}\"", s.replace('"', "?"))
         } else {
-            if s.is_empty() || has_leading_trailing_whitespace {
-                format!("\"{}\"", s)
-            } else if s.starts_with('"') {
-                s.replace('"', "?")
-            } else {
-                s
-            }
+            s
         }
     }
 

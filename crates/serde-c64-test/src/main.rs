@@ -84,7 +84,6 @@ fn main() {
             ", ", "a, ", ",a ", "a,a ", ",a, ",  "A, ", ",A ", "A,A ", ",A, ",
             " , ", " a, ", " ,a ", " a,a ", " ,a, ", " A, ", " ,A ", " A,A ", " ,A, ",
         ],
-
     };
 
     let test_output = File::create("disk/test-output").unwrap();
