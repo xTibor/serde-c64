@@ -28,6 +28,7 @@ struct TestStruct {
     stand_cries: HashMap<&'static str, &'static str>,
     cards: [(usize, CardSuit); 5],
     song: Vec<(&'static str, usize, usize)>,
+    card_colors: Vec<Option<(&'static str, CardSuit)>>,
     units: (((), ((), ())), ((), ()), u8),
     to_be_continued: Duration,
     string_escape: Vec<&'static str>,
@@ -79,6 +80,13 @@ fn main() {
             ("b",  4,  2), ("c#", 5,  2), ("d",  5,  3), ("e",  5,  3),
             ("d",  5,  2),
         ],
+        card_colors: vec![
+            Some(("red",   CardSuit::Diamonds)),
+            Some(("black", CardSuit::Clubs   )),
+            Some(("red",   CardSuit::Hearts  )),
+            Some(("black", CardSuit::Spades  )),
+            None,
+        ],
         units: (((), ((), ())), ((), ()), 1),
         to_be_continued: Duration::from_secs(603300),
         string_escape: vec![
@@ -105,6 +113,7 @@ fn main() {
         emit_bytes_length: false,
         emit_sequence_length: true,
         emit_map_length: true,
+        emit_enum_names: true,
     };
 
     serde_c64::to_writer(test_output, &test_data, options).unwrap();

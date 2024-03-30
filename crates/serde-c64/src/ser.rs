@@ -18,6 +18,8 @@ pub struct Options {
     pub emit_sequence_length: bool,
 
     pub emit_map_length: bool,
+
+    pub emit_enum_names: bool,
 }
 
 impl Default for Options {
@@ -29,6 +31,7 @@ impl Default for Options {
             emit_bytes_length: false,
             emit_sequence_length: false,
             emit_map_length: false,
+            emit_enum_names: false,
         }
     }
 }
@@ -202,14 +205,14 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     }
 
     fn serialize_none(self) -> Result<()> {
-        self.serialize_bool(false)
+        self.serialize_unit_variant("Option", 0, "None")
     }
 
     fn serialize_some<T: ?Sized>(self, value: &T) -> Result<()>
     where
         T: Serialize,
     {
-        self.serialize_bool(true)?;
+        self.serialize_unit_variant("Option", 1, "Some")?;
         value.serialize(self)
     }
 
@@ -221,8 +224,12 @@ impl<'a> ser::Serializer for &'a mut Serializer {
         Ok(())
     }
 
-    fn serialize_unit_variant(self, _name: &'static str, variant_index: u32, _variant: &'static str) -> Result<()> {
-        variant_index.serialize(self)
+    fn serialize_unit_variant(self, _name: &'static str, variant_index: u32, variant: &'static str) -> Result<()> {
+        if self.options.emit_enum_names {
+            variant.serialize(self)
+        } else {
+            variant_index.serialize(self)
+        }
     }
 
     fn serialize_newtype_struct<T: ?Sized>(self, _name: &'static str, value: &T) -> Result<()>
