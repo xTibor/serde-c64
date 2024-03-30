@@ -20,6 +20,7 @@ enum CardSuit {
     Spades,
 }
 
+#[allow(clippy::type_complexity)]
 #[derive(Serialize)]
 struct TestStruct {
     people: Vec<Person>,
