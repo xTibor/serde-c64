@@ -1,3 +1,5 @@
+use std::default;
+
 use basic::{PetsciiEncodingOptions, MAX_LINE_LENGTH};
 
 #[derive(Debug, Copy, Clone)]
@@ -24,6 +26,15 @@ impl Default for ContainerPrefixOptions {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+#[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
+pub enum StringQuotationMethod {
+    #[default]
+    WhenNecessary,
+    Always,
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 #[derive(Debug, Copy, Clone)]
 pub struct Options {
     pub line_length: usize,
@@ -36,6 +47,8 @@ pub struct Options {
 
     pub container_prefix_options: ContainerPrefixOptions,
 
+    pub string_quotation_method: StringQuotationMethod,
+
     pub emit_enum_names: bool,
 }
 
@@ -47,6 +60,7 @@ impl Default for Options {
             line_number_increment: 1,
             encoding_options: PetsciiEncodingOptions::default(),
             container_prefix_options: ContainerPrefixOptions::default(),
+            string_quotation_method: StringQuotationMethod::default(),
             emit_enum_names: false,
         }
     }

@@ -5,6 +5,7 @@ use serde::{ser, Serialize};
 
 use crate::error::{Error, Result};
 use crate::options::Options;
+use crate::StringQuotationMethod;
 
 pub struct Serializer {
     options: Options,
@@ -59,7 +60,8 @@ impl Serializer {
             basic::PetsciiVariant::Shifted => !s.chars().any(char::is_uppercase),
         };
 
-        if s.is_empty()
+        if self.options.string_quotation_method == StringQuotationMethod::Always
+            || s.is_empty()
             || s.starts_with(' ')
             || s.ends_with(' ')
             || s.contains(',')
