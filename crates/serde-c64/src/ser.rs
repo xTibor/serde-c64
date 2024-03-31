@@ -286,10 +286,16 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     fn serialize_struct_variant(
         self,
         _name: &'static str,
-        _variant_index: u32,
-        _variant: &'static str,
+        variant_index: u32,
+        variant: &'static str,
         _len: usize,
     ) -> Result<Self::SerializeStructVariant> {
+        if self.options.emit_enum_names {
+            self.serialize_str(variant)?;
+        } else {
+            self.serialize_u32(variant_index)?;
+        }
+
         Ok(self)
     }
 }
