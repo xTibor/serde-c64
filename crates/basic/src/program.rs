@@ -1,6 +1,8 @@
 use crate::petscii::PetsciiEncodingOptions;
 use crate::token::BasicToken;
 
+pub const MAX_LINE_LENGTH: usize = 250;
+
 #[derive(Debug, Clone)]
 pub struct BasicLine(pub u16, pub Vec<BasicToken>);
 
@@ -9,8 +11,10 @@ impl BasicLine {
         self.1.iter().map(BasicToken::size).sum()
     }
 
-    pub fn push_token(&mut self, token: BasicToken) -> Result<(), &str> {
-        if token.size() + self.size() <= 250 {
+    pub fn push_token(&mut self, token: BasicToken, line_length: usize) -> Result<(), &str> {
+        assert!(line_length <= MAX_LINE_LENGTH);
+
+        if token.size() + self.size() <= line_length {
             self.1.push(token);
             Ok(())
         } else {

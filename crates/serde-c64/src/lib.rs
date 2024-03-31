@@ -1,5 +1,7 @@
 mod error;
+mod options;
 mod ser;
 
 pub use error::{Error, Result};
-pub use ser::{to_writer, Options, Serializer};
+pub use options::Options;
+pub use ser::{to_writer, Serializer};

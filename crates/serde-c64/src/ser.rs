@@ -1,40 +1,10 @@
 use std::io::Write;
 
-use basic::{BasicKeyword, BasicLine, BasicProgram, BasicToken, PetsciiEncodingOptions, PetsciiString};
+use basic::{BasicKeyword, BasicLine, BasicProgram, BasicToken, PetsciiString};
 use serde::{ser, Serialize};
 
 use crate::error::{Error, Result};
-
-#[derive(Debug, Copy, Clone)]
-pub struct Options {
-    pub line_number_start: u16,
-
-    pub line_number_increment: u16,
-
-    pub encoding_options: PetsciiEncodingOptions,
-
-    pub emit_bytes_length: bool,
-
-    pub emit_sequence_length: bool,
-
-    pub emit_map_length: bool,
-
-    pub emit_enum_names: bool,
-}
-
-impl Default for Options {
-    fn default() -> Self {
-        Self {
-            line_number_start: 1000,
-            line_number_increment: 1,
-            encoding_options: Default::default(),
-            emit_bytes_length: false,
-            emit_sequence_length: false,
-            emit_map_length: false,
-            emit_enum_names: false,
-        }
-    }
-}
+use crate::options::Options;
 
 pub struct Serializer {
     options: Options,
@@ -112,11 +82,11 @@ impl Serializer {
 
     fn emit_basic_data_item(&mut self, s: impl ToString) -> Result<()> {
         let token = self.format_basic_data_item(s.to_string());
-        if let Err(_) = self.basic_next_line.push_token(token) {
+        if let Err(_) = self.basic_next_line.push_token(token, self.options.line_length) {
             self.finalize_line()?;
 
             let token = self.format_basic_data_item(s.to_string());
-            if let Err(_) = self.basic_next_line.push_token(token) {
+            if let Err(_) = self.basic_next_line.push_token(token, self.options.line_length) {
                 panic!("Failed to serialize token");
             }
         }

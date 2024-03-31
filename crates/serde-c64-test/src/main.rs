@@ -105,6 +105,7 @@ fn main() {
     let test_output = File::create("disk/test-output").unwrap();
 
     let options = serde_c64::Options {
+        line_length: 64,
         line_number_start: 1000,
         line_number_increment: 1,
         encoding_options: PetsciiEncodingOptions {
