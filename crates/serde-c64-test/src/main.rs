@@ -113,7 +113,6 @@ fn main() {
             variant: basic::PetsciiVariant::Shifted,
         },
         container_prefix_options: ContainerPrefixOptions {
-            byte_slice_length: false,
             sequence_length: true,
             map_length: true,
             tuple_length: false,

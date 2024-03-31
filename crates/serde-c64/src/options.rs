@@ -2,9 +2,6 @@ use basic::{PetsciiEncodingOptions, MAX_LINE_LENGTH};
 
 #[derive(Debug, Copy, Clone)]
 pub struct ContainerPrefixOptions {
-    /// Prefix `&[u8]` byte slices with their length.
-    pub byte_slice_length: bool,
-
     /// Prefix sequence-like types (`Vec`, `&[T]`, etc.) with their lengths.
     pub sequence_length: bool,
 
@@ -18,7 +15,6 @@ pub struct ContainerPrefixOptions {
 impl Default for ContainerPrefixOptions {
     fn default() -> Self {
         Self {
-            byte_slice_length: true,
             sequence_length: true,
             map_length: true,
             tuple_length: false,

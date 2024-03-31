@@ -163,7 +163,7 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     }
 
     fn serialize_bytes(self, v: &[u8]) -> Result<()> {
-        if self.options.container_prefix_options.byte_slice_length {
+        if self.options.container_prefix_options.sequence_length {
             self.serialize_u64(v.len() as u64)?;
         }
 
