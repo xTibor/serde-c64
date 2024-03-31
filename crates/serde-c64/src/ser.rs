@@ -165,7 +165,6 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     fn serialize_bytes(self, v: &[u8]) -> Result<()> {
         if self.options.container_prefix_options.byte_slice_length {
             self.serialize_u64(v.len() as u64)?;
-            self.finalize_line()?;
         }
 
         for b in v {
@@ -213,19 +212,24 @@ impl<'a> ser::Serializer for &'a mut Serializer {
         self,
         _name: &'static str,
         variant_index: u32,
-        _variant: &'static str,
-        _value: &T,
+        variant: &'static str,
+        value: &T,
     ) -> Result<()>
     where
         T: Serialize,
     {
-        variant_index.serialize(self)
+        if self.options.emit_enum_names {
+            self.serialize_str(variant)?;
+        } else {
+            self.serialize_u32(variant_index)?;
+        }
+
+        value.serialize(self)
     }
 
     fn serialize_seq(self, len: Option<usize>) -> Result<Self::SerializeSeq> {
         if self.options.container_prefix_options.sequence_length {
             self.serialize_u64(len.unwrap_or(0) as u64)?;
-            self.finalize_line()?;
         }
 
         Ok(self)
@@ -234,7 +238,6 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     fn serialize_tuple(self, len: usize) -> Result<Self::SerializeTuple> {
         if self.options.container_prefix_options.tuple_length {
             self.serialize_u64(len as u64)?;
-            self.finalize_line()?;
         }
 
         Ok(self)
@@ -243,7 +246,6 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     fn serialize_tuple_struct(self, _name: &'static str, len: usize) -> Result<Self::SerializeTupleStruct> {
         if self.options.container_prefix_options.tuple_length {
             self.serialize_u64(len as u64)?;
-            self.finalize_line()?;
         }
 
         Ok(self)
@@ -252,17 +254,26 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     fn serialize_tuple_variant(
         self,
         _name: &'static str,
-        _variant_index: u32,
-        _variant: &'static str,
-        _len: usize,
+        variant_index: u32,
+        variant: &'static str,
+        len: usize,
     ) -> Result<Self::SerializeTupleVariant> {
+        if self.options.emit_enum_names {
+            self.serialize_str(variant)?;
+        } else {
+            self.serialize_u32(variant_index)?;
+        }
+
+        if self.options.container_prefix_options.tuple_length {
+            self.serialize_u64(len as u64)?;
+        }
+
         Ok(self)
     }
 
     fn serialize_map(self, len: Option<usize>) -> Result<Self::SerializeMap> {
         if self.options.container_prefix_options.map_length {
             self.serialize_u64(len.unwrap_or(0) as u64)?;
-            self.finalize_line()?;
         }
 
         Ok(self)
