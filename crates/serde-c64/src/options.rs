@@ -1,5 +1,3 @@
-use std::default;
-
 use basic::{PetsciiEncodingOptions, MAX_LINE_LENGTH};
 
 #[derive(Debug, Copy, Clone)]
