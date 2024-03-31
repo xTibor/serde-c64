@@ -163,7 +163,7 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     }
 
     fn serialize_bytes(self, v: &[u8]) -> Result<()> {
-        if self.options.emit_bytes_length {
+        if self.options.container_prefix_options.byte_slice_length {
             self.serialize_u64(v.len() as u64)?;
             self.finalize_line()?;
         }
@@ -223,7 +223,7 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     }
 
     fn serialize_seq(self, len: Option<usize>) -> Result<Self::SerializeSeq> {
-        if self.options.emit_sequence_length {
+        if self.options.container_prefix_options.sequence_length {
             self.serialize_u64(len.unwrap_or(0) as u64)?;
             self.finalize_line()?;
         }
@@ -231,11 +231,21 @@ impl<'a> ser::Serializer for &'a mut Serializer {
         Ok(self)
     }
 
-    fn serialize_tuple(self, _len: usize) -> Result<Self::SerializeTuple> {
+    fn serialize_tuple(self, len: usize) -> Result<Self::SerializeTuple> {
+        if self.options.container_prefix_options.tuple_length {
+            self.serialize_u64(len as u64)?;
+            self.finalize_line()?;
+        }
+
         Ok(self)
     }
 
-    fn serialize_tuple_struct(self, _name: &'static str, _len: usize) -> Result<Self::SerializeTupleStruct> {
+    fn serialize_tuple_struct(self, _name: &'static str, len: usize) -> Result<Self::SerializeTupleStruct> {
+        if self.options.container_prefix_options.tuple_length {
+            self.serialize_u64(len as u64)?;
+            self.finalize_line()?;
+        }
+
         Ok(self)
     }
 
@@ -250,7 +260,7 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     }
 
     fn serialize_map(self, len: Option<usize>) -> Result<Self::SerializeMap> {
-        if self.options.emit_map_length {
+        if self.options.container_prefix_options.map_length {
             self.serialize_u64(len.unwrap_or(0) as u64)?;
             self.finalize_line()?;
         }

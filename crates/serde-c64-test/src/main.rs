@@ -4,6 +4,7 @@ use std::time::Duration;
 
 use basic::PetsciiEncodingOptions;
 use serde::Serialize;
+use serde_c64::ContainerPrefixOptions;
 
 #[derive(Serialize)]
 struct Person {
@@ -111,9 +112,12 @@ fn main() {
         encoding_options: PetsciiEncodingOptions {
             variant: basic::PetsciiVariant::Shifted,
         },
-        emit_bytes_length: false,
-        emit_sequence_length: true,
-        emit_map_length: true,
+        container_prefix_options: ContainerPrefixOptions {
+            byte_slice_length: false,
+            sequence_length: true,
+            map_length: true,
+            tuple_length: false,
+        },
         emit_enum_names: true,
     };
 

@@ -1,6 +1,34 @@
 use basic::{PetsciiEncodingOptions, MAX_LINE_LENGTH};
 
 #[derive(Debug, Copy, Clone)]
+pub struct ContainerPrefixOptions {
+    /// Prefix `&[u8]` byte slices with their length.
+    pub byte_slice_length: bool,
+
+    /// Prefix sequence-like types (`Vec`, `&[T]`, etc.) with their lengths.
+    pub sequence_length: bool,
+
+    /// Prefix hash map-like types (`HashMap`, etc.) with their length.
+    pub map_length: bool,
+
+    /// Prefix tuple-like types (`(T, T)`, `struct S(T, T)`, `&[T; N]`, etc.) with their length.
+    pub tuple_length: bool,
+}
+
+impl Default for ContainerPrefixOptions {
+    fn default() -> Self {
+        Self {
+            byte_slice_length: true,
+            sequence_length: true,
+            map_length: true,
+            tuple_length: false,
+        }
+    }
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#[derive(Debug, Copy, Clone)]
 pub struct Options {
     pub line_length: usize,
 
@@ -10,11 +38,7 @@ pub struct Options {
 
     pub encoding_options: PetsciiEncodingOptions,
 
-    pub emit_bytes_length: bool,
-
-    pub emit_sequence_length: bool,
-
-    pub emit_map_length: bool,
+    pub container_prefix_options: ContainerPrefixOptions,
 
     pub emit_enum_names: bool,
 }
@@ -25,10 +49,8 @@ impl Default for Options {
             line_length: MAX_LINE_LENGTH,
             line_number_start: 1000,
             line_number_increment: 1,
-            encoding_options: Default::default(),
-            emit_bytes_length: false,
-            emit_sequence_length: false,
-            emit_map_length: false,
+            encoding_options: PetsciiEncodingOptions::default(),
+            container_prefix_options: ContainerPrefixOptions::default(),
             emit_enum_names: false,
         }
     }
