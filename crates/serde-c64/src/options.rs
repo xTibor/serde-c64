@@ -26,9 +26,46 @@ impl Default for ContainerPrefixOptions {
 
 #[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
 pub enum StringQuotationMethod {
+    /// Only quotes strings when necessary.
+    ///
+    /// Example:
+    /// `1000 DATA AA, BB, CC, " DD", "EE "`
     #[default]
     WhenNecessary,
+
+    /// Always quotes strings.
+    ///
+    /// Example:
+    /// `1000 DATA "AA", "BB", "CC", " DD", "EE "`
     Always,
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#[derive(Debug, Copy, Clone)]
+pub struct SpacingOptions {
+    /// Put spaces between `DATA` statements and the first data entries.
+    ///
+    /// Example:
+    /// * `false`: `1000 DATA1234`
+    /// * `true`: `1000 DATA 1234`
+    pub space_after_data_statement: bool,
+
+    /// Put spaces between data entries.
+    ///
+    /// Example:
+    /// * `false`: `1000 DATA 1,2,3,4`
+    /// * `true`: `1000 DATA 1, 2, 3, 4`
+    pub space_between_data_entries: bool,
+}
+
+impl Default for SpacingOptions {
+    fn default() -> Self {
+        Self {
+            space_after_data_statement: true,
+            space_between_data_entries: true,
+        }
+    }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -45,6 +82,8 @@ pub struct Options {
 
     pub container_prefix_options: ContainerPrefixOptions,
 
+    pub spacing_options: SpacingOptions,
+
     pub string_quotation_method: StringQuotationMethod,
 
     pub emit_enum_names: bool,
@@ -58,6 +97,7 @@ impl Default for Options {
             line_number_increment: 1,
             encoding_options: PetsciiEncodingOptions::default(),
             container_prefix_options: ContainerPrefixOptions::default(),
+            spacing_options: SpacingOptions::default(),
             string_quotation_method: StringQuotationMethod::default(),
             emit_enum_names: false,
         }

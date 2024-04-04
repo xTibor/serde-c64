@@ -75,10 +75,14 @@ impl Serializer {
     }
 
     fn format_basic_data_item(&self, s: impl AsRef<str>) -> BasicToken {
+        let bool_to_space = |b| if b { " " } else { "" };
+
         if self.basic_next_line_started {
-            BasicToken::Raw(PetsciiString(format!(", {}", s.as_ref())))
+            let space = bool_to_space(self.options.spacing_options.space_between_data_entries);
+            BasicToken::Raw(PetsciiString(format!(",{}{}", space, s.as_ref())))
         } else {
-            BasicToken::Raw(PetsciiString(format!(" {}", s.as_ref())))
+            let space = bool_to_space(self.options.spacing_options.space_after_data_statement);
+            BasicToken::Raw(PetsciiString(format!("{}{}", space, s.as_ref())))
         }
     }
 

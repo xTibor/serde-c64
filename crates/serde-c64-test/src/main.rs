@@ -4,7 +4,7 @@ use std::time::Duration;
 
 use basic::PetsciiEncodingOptions;
 use serde::Serialize;
-use serde_c64::{ContainerPrefixOptions, StringQuotationMethod};
+use serde_c64::{ContainerPrefixOptions, SpacingOptions, StringQuotationMethod};
 
 #[derive(Serialize)]
 struct Person {
@@ -116,6 +116,10 @@ fn main() {
             sequence_length: true,
             map_length: true,
             tuple_length: false,
+        },
+        spacing_options: SpacingOptions {
+            space_after_data_statement: true,
+            space_between_data_entries: true,
         },
         string_quotation_method: StringQuotationMethod::WhenNecessary,
         emit_enum_names: true,
